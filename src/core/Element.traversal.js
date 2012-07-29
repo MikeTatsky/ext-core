@@ -165,5 +165,5 @@ Ext.Element.addMethods(function(){
 	        }
 	        return null;
 	    }	
-    }
+    };
 }());

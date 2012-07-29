@@ -238,7 +238,7 @@ Ext.Ajax.request({
                           failure: me.handleFailure,
                           scope: me,
                           argument: {options: o},
-                          timeout : o.timeout || me.timeout
+                          timeout : Ext.num(o.timeout, me.timeout)
                     },
                     form,
                     serForm;
@@ -256,7 +256,7 @@ Ext.Ajax.request({
 
                 if((form = Ext.getDom(o.form))){
                     url = url || form.action;
-                     if(o.isUpload || /multipart\/form-data/i.test(form.getAttribute("enctype"))) {
+                     if(o.isUpload || (/multipart\/form-data/i.test(form.getAttribute("enctype")))) {
                          return me.doFormUpload.call(me, o, p, url);
                      }
                     serForm = Ext.lib.Ajax.serializeForm(form);
@@ -270,7 +270,7 @@ Ext.Ajax.request({
                     url = Ext.urlAppend(url, dcp + '=' + (new Date().getTime()));
                 }
 
-                o.headers = Ext.apply(o.headers || {}, me.defaultHeaders || {});
+                o.headers = Ext.applyIf(o.headers || {}, me.defaultHeaders || {});
 
                 if(o.autoAbort === true || me.autoAbort) {
                     me.abort();

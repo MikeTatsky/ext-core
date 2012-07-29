@@ -1,5 +1,5 @@
 	
-	if(Ext.isIE) {
+	if (Ext.isIE) {
         function fnCleanUp() {
             var p = Function.prototype;
             delete p.createSequence;

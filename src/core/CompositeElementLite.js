@@ -253,22 +253,30 @@ Ext.CompositeElementLite.prototype = {
 
 Ext.CompositeElementLite.prototype.on = Ext.CompositeElementLite.prototype.addListener;
 
-(function(){
-var fnName,
-    ElProto = Ext.Element.prototype,
-    CelProto = Ext.CompositeElementLite.prototype;
+/**
+ * @private
+ * Copies all of the functions from Ext.Element's prototype onto CompositeElementLite's prototype.
+ * This is called twice - once immediately below, and once again after additional Ext.Element
+ * are added in Ext JS
+ */
+Ext.CompositeElementLite.importElementMethods = function() {
+    var fnName,
+        ElProto = Ext.Element.prototype,
+        CelProto = Ext.CompositeElementLite.prototype;
 
-for(fnName in ElProto){
-    if(Ext.isFunction(ElProto[fnName])){
-        (function(fnName){
-            CelProto[fnName] = CelProto[fnName] || function(){
-                return this.invoke(fnName, arguments);
-            };
-        }).call(CelProto, fnName);
+    for (fnName in ElProto) {
+        if (typeof ElProto[fnName] == 'function'){
+            (function(fnName) {
+                CelProto[fnName] = CelProto[fnName] || function() {
+                    return this.invoke(fnName, arguments);
+                };
+            }).call(CelProto, fnName);
 
+        }
     }
-}
-})();
+};
+
+Ext.CompositeElementLite.importElementMethods();
 
 if(Ext.DomQuery){
     Ext.Element.selectorFunction = Ext.DomQuery.select;

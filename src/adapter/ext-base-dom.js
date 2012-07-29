@@ -126,7 +126,7 @@
 		            ret = [x,y];
 	            }
          	}
-            return ret
+            return ret;
         },
 
         setXY : function(el, xy) {
@@ -137,7 +137,9 @@
             	pos;            	
             
             for (pos in pts) {	            
-	            if(!isNaN(pts[pos])) style[pos] = pts[pos] + "px"
+	            if (!isNaN(pts[pos])) {
+	                style[pos] = pts[pos] + "px";
+                }
             }
         },
 

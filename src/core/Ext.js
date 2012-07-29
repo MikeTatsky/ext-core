@@ -12,11 +12,11 @@ Ext = {
      * The version of the framework
      * @type String
      */
-    version : '3.2.2',
+    version : '3.3.3',
     versionDetail : {
-        major: 3,
-        minor: 2,
-        patch: 2
+        major : 3,
+        minor : 3,
+        patch : 3
     }
 };
 
@@ -49,6 +49,7 @@ Ext.apply = function(o, c, defaults){
             return r.test(ua);
         },
         DOC = document,
+        docMode = DOC.documentMode,
         isStrict = DOC.compatMode == "CSS1Compat",
         isOpera = check(/opera/),
         isChrome = check(/\bchrome\b/),
@@ -58,9 +59,10 @@ Ext.apply = function(o, c, defaults){
         isSafari3 = isSafari && check(/version\/3/),
         isSafari4 = isSafari && check(/version\/4/),
         isIE = !isOpera && check(/msie/),
-        isIE7 = isIE && check(/msie 7/),
-        isIE8 = isIE && check(/msie 8/),
-        isIE6 = isIE && !isIE7 && !isIE8,
+        isIE7 = isIE && (check(/msie 7/) || docMode == 7),
+        isIE8 = isIE && (check(/msie 8/) && docMode != 7),
+        isIE9 = isIE && check(/msie 9/),
+        isIE6 = isIE && !isIE7 && !isIE8 && !isIE9,
         isGecko = !isWebKit && check(/gecko/),
         isGecko2 = isGecko && check(/rv:1\.8/),
         isGecko3 = isGecko && check(/rv:1\.9/),
@@ -106,6 +108,14 @@ Ext.apply = function(o, c, defaults){
          * @type Boolean
          * @property enableFx
          */
+
+        /**
+         * HIGHLY EXPERIMENTAL
+         * True to force css based border-box model override and turning off javascript based adjustments. This is a
+         * runtime configuration and must be set before onReady.
+         * @type Boolean
+         */
+        enableForcedBoxModel : false,
 
         /**
          * True to automatically uncache orphaned Ext.Elements periodically (defaults to true)
@@ -297,15 +307,29 @@ Company.data.CustomStore = function(config) { ... }
          * @method namespace
          */
         namespace : function(){
-            var o, d;
-            Ext.each(arguments, function(v) {
-                d = v.split(".");
-                o = window[d[0]] = window[d[0]] || {};
-                Ext.each(d.slice(1), function(v2){
-                    o = o[v2] = o[v2] || {};
-                });
-            });
-            return o;
+            var len1 = arguments.length,
+                i = 0,
+                len2,
+                j,
+                main,
+                ns,
+                sub,
+                current;
+                
+            for(; i < len1; ++i) {
+                main = arguments[i];
+                ns = arguments[i].split('.');
+                current = window[ns[0]];
+                if (current === undefined) {
+                    current = window[ns[0]] = {};
+                }
+                sub = ns.slice(1);
+                len2 = sub.length;
+                for(j = 0; j < len2; ++j) {
+                    current = current[sub[j]] = current[sub[j]] || {};
+                }
+            }
+            return current;
         },
 
         /**
@@ -747,6 +771,11 @@ function(el){
          */
         isIE8 : isIE8,
         /**
+         * True if the detected browser is Internet Explorer 9.x.
+         * @type Boolean
+         */
+        isIE9 : isIE9,
+        /**
          * True if the detected browser uses the Gecko layout engine (e.g. Mozilla, Firefox).
          * @type Boolean
          */
@@ -806,7 +835,7 @@ Company.data.CustomStore = function(config) { ... }
     Ext.ns = Ext.namespace;
 })();
 
-Ext.ns("Ext.util", "Ext.lib", "Ext.data");
+Ext.ns('Ext.util', 'Ext.lib', 'Ext.data', 'Ext.supports');
 
 Ext.elCache = {};
 

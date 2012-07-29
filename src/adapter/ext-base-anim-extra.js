@@ -134,7 +134,7 @@
     // Color Animation
     EXTLIB.Anim.color = function(el, args, duration, easing, cb, scope) {
         return EXTLIB.Anim.run(el, args, duration, easing, cb, scope, EXTLIB.ColorAnim);
-    }
+    };
 
     EXTLIB.ColorAnim = function(el, attributes, duration, method) {
         EXTLIB.ColorAnim.superclass.constructor.call(this, el, attributes, duration, method);
