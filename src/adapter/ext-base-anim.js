@@ -1,4 +1,4 @@
-(function(){    
+(function(){
     var EXTLIB = Ext.lib,
         noNegatives = /width|height|opacity|padding/i,
         offsetAttribute = /^((width|height)|(top|left))$/,
@@ -8,9 +8,9 @@
             return typeof v !== 'undefined';
         },
         now = function(){
-            return new Date();    
+            return new Date();
         };
-        
+
     EXTLIB.Anim = {
         motion : function(el, args, duration, easing, cb, scope) {
             return this.run(el, args, duration, easing, cb, scope, Ext.lib.Motion);
@@ -30,7 +30,7 @@
             return anim;
         }
     };
-    
+
     EXTLIB.AnimBase = function(el, attributes, duration, method) {
         if (el) {
             this.init(el, attributes, duration, method);
@@ -55,7 +55,7 @@
         getAttr: function(attr) {
             var el = Ext.fly(this.el),
                 val = el.getStyle(attr),
-                a = offsetAttribute.exec(attr) || []
+                a = offsetAttribute.exec(attr) || [];
 
             if (val !== 'auto' && !offsetUnit.test(val)) {
                 return parseFloat(val);
@@ -82,7 +82,7 @@
         },
 
 
-        setRunAttr: function(attr) {            
+        setRunAttr: function(attr) {
             var me = this,
                 a = this.attributes[attr],
                 to = a.to,
@@ -102,9 +102,9 @@
             }else if(isset(by)) {
                 if (Ext.isArray(start)){
                     end = [];
-					for(var i=0,len=start.length; i<len; i++) {
-						end[i] = start[i] + by[i];
-					}
+                    for(var i=0,len=start.length; i<len; i++) {
+                        end[i] = start[i] + by[i];
+                    }
                 }else{
                     end = start + by;
                 }
@@ -122,7 +122,7 @@
             var me = this,
                 actualFrames = 0,
                 mgr = EXTLIB.AnimMgr;
-                
+
             Ext.apply(me, {
                 isAnimated: false,
                 startTime: null,
@@ -137,19 +137,19 @@
                 animate: function(){
                     var me = this,
                         d = me.duration;
-                    
+
                     if(me.isAnimated){
                         return false;
                     }
 
                     me.curFrame = 0;
                     me.totalFrames = me.useSec ? Math.ceil(mgr.fps * d) : d;
-                    mgr.registerElement(me); 
+                    mgr.registerElement(me);
                 },
-                
+
                 stop: function(finish){
                     var me = this;
-                
+
                     if(finish){
                         me.curFrame = me.totalFrames;
                         me._onTween.fire();
@@ -161,7 +161,7 @@
             var onStart = function(){
                 var me = this,
                     attr;
-                
+
                 me.onStart.fire();
                 me.runAttrs = {};
                 for(attr in this.attributes){
@@ -205,11 +205,11 @@
             };
 
             me.onStart = new Ext.util.Event(me);
-            me.onTween = new Ext.util.Event(me);            
+            me.onTween = new Ext.util.Event(me);
             me.onComplete = new Ext.util.Event(me);
             (me._onStart = new Ext.util.Event(me)).addListener(onStart);
             (me._onTween = new Ext.util.Event(me)).addListener(onTween);
-            (me._onComplete = new Ext.util.Event(me)).addListener(onComplete); 
+            (me._onComplete = new Ext.util.Event(me)).addListener(onComplete);
         }
     };
 
@@ -230,7 +230,7 @@
                 tween._onStart.fire();
                 me.start();
             },
-            
+
             unRegister: function(tween, index){
                 tween._onComplete.fire();
                 index = index || getIndex(tween);
@@ -242,13 +242,13 @@
                     me.stop();
                 }
             },
-            
+
             start: function(){
                 if(thread === null){
                     thread = setInterval(me.run, me.delay);
                 }
             },
-            
+
             stop: function(tween){
                 if(!tween){
                     clearInterval(thread);
@@ -265,7 +265,7 @@
                     me.unRegister(tween);
                 }
             },
-            
+
             run: function(){
                 var tf, i, len, tween;
                 for(i = 0, len = queue.length; i<len; i++) {
@@ -281,7 +281,7 @@
                         }else{
                             me.stop(tween);
                         }
-                    }                   
+                    }
                 }
             }
         });
@@ -323,7 +323,7 @@
         this.getPosition = function(points, t) {
             var n = points.length,
                 tmp = [],
-                c = 1 - t, 
+                c = 1 - t,
                 i,
                 j;
 
@@ -370,14 +370,13 @@
         Ext.extend(EXTLIB.Motion, Ext.lib.AnimBase);
 
         var superclass = EXTLIB.Motion.superclass,
-            proto = EXTLIB.Motion.prototype,
             pointsRe = /^points$/i;
 
         Ext.apply(EXTLIB.Motion.prototype, {
             setAttr: function(attr, val, unit){
                 var me = this,
                     setAttr = superclass.setAttr;
-                    
+
                 if (pointsRe.test(attr)) {
                     unit = unit || 'px';
                     setAttr.call(me, 'left', val[0], unit);
@@ -386,25 +385,25 @@
                     setAttr.call(me, attr, val, unit);
                 }
             },
-            
+
             getAttr: function(attr){
                 var me = this,
                     getAttr = superclass.getAttr;
-                    
+
                 return pointsRe.test(attr) ? [getAttr.call(me, 'left'), getAttr.call(me, 'top')] : getAttr.call(me, attr);
             },
-            
+
             doMethod: function(attr, start, end){
                 var me = this;
-                
+
                 return pointsRe.test(attr)
                         ? EXTLIB.Bezier.getPosition(me.runAttrs[attr], me.method(me.curFrame, 0, 100, me.totalFrames) / 100)
                         : superclass.doMethod.call(me, attr, start, end);
             },
-            
+
             setRunAttr: function(attr){
                 if(pointsRe.test(attr)){
-                    
+
                     var me = this,
                         el = this.el,
                         points = this.attributes.points,
@@ -418,7 +417,7 @@
                         end,
                         len,
                         ra;
-                  
+
 
                     if(control.length > 0 && !Ext.isArray(control[0])){
                         control = [control];

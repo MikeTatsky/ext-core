@@ -11,10 +11,8 @@ Ext.lib.Event = function() {
         // constants
         POLL_RETRYS = 200,
         POLL_INTERVAL = 20,
-        EL = 0,
         TYPE = 0,
         FN = 1,
-        WFN = 2,
         OBJ = 2,
         ADJ_SCOPE = 3,
         SCROLLLEFT = 'scrollLeft',
@@ -93,20 +91,22 @@ Ext.lib.Event = function() {
     function _tryPreloadAttach() {
         var ret = false,
             notAvail = [],
-            element, i, len, v,
+            element, i, v, override,
             tryAgain = !loadComplete || (retryCount > 0);
 
-        if (!locked) {
+        if(!locked){
             locked = true;
-
-            for (i = 0, len = onAvailStack.length; i < len; i++) {
+            
+            for(i = 0; i < onAvailStack.length; ++i){
                 v = onAvailStack[i];
                 if(v && (element = doc.getElementById(v.id))){
                     if(!v.checkReady || loadComplete || element.nextSibling || (doc && doc.body)) {
-                        element = v.override ? (v.override === true ? v.obj : v.override) : element;
+                        override = v.override;
+                        element = override ? (override === true ? v.obj : override) : element;
                         v.fn.call(element, v.obj);
                         onAvailStack.remove(v);
-                    } else {
+                        --i;
+                    }else{
                         notAvail.push(v);
                     }
                 }
@@ -120,7 +120,6 @@ Ext.lib.Event = function() {
                 clearInterval(_interval);
                 _interval = null;
             }
-
             ret = !(locked = false);
         }
         return ret;
@@ -235,8 +234,8 @@ Ext.lib.Event = function() {
         getRelatedTarget : function(ev) {
             ev = ev.browserEvent || ev;
             return this.resolveTextNode(ev.relatedTarget ||
-                    (ev.type == MOUSEOUT ? ev.toElement :
-                     ev.type == MOUSEOVER ? ev.fromElement : null));
+                (/(mouseout|mouseleave)/.test(ev.type) ? ev.toElement :
+                 /(mouseover|mouseenter)/.test(ev.type) ? ev.fromElement : null));
         },
 
         getPageX : function(ev) {
@@ -308,18 +307,17 @@ Ext.lib.Event = function() {
 
         _load : function(e) {
             loadComplete = true;
-            var EU = Ext.lib.Event;
+            
             if (Ext.isIE && e !== true) {
-        // IE8 complains that _load is null or not an object
-        // so lets remove self via arguments.callee
+                // IE8 complains that _load is null or not an object
+                // so lets remove self via arguments.callee
                 doRemove(win, "load", arguments.callee);
             }
         },
 
         _unload : function(e) {
              var EU = Ext.lib.Event,
-                i, j, l, v, ul, id, len, index, scope;
-
+                i, v, ul, id, len, scope;
 
             for (id in unloadListeners) {
                 ul = unloadListeners[id];
