@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Event Test Suite</title>
+
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/logger/assets/logger.css">
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/yuitest/assets/testlogger.css">     
+
+<script type="text/javascript" src="yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script type="text/javascript" src="yui_2.6.0/yui/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+<script type="text/javascript" src="../ext-core-debug.js"></script>
+
+<script type="text/javascript">
+(function() {
+    var Y = YAHOO.util,
+        tool = YAHOO.tool,
+        suite = new tool.TestSuite("Event Suite");
+        
+       function fireEvent(type, element, x, y){
+	    	if( document.createEvent ){
+				customEvent = document.createEvent("MouseEvents");
+				if (customEvent.initMouseEvent) {
+					customEvent.initMouseEvent(type, false, false, null, null,
+                                     null, null,x, y,
+                                     null, null, null, null, 
+                                     null, null);
+				} else {
+					customEvent.initEvent(type, false, false);
+					customEvent.clientX = x;
+					customEvent.clientY = y;	
+				}
+				
+				element.dispatchEvent(customEvent);	
+			} else {
+				customEvent = document.createEventObject();
+				customEvent.clientX = x;
+				customEvent.clientY = y;
+				element.fireEvent("on" + type, customEvent);	
+			}   
+       }
+
+    Y.Event.onDOMReady(function(){
+	    var logger = new YAHOO.tool.TestLogger(null, { height: '80%' });
+	    tool.TestRunner.add(suite);
+	    	    
+	    suite.add( new tool.TestCase({
+		    name : 'Event test',		    		    
+		    
+		    test_onclick : function() {	
+			    var me = this,
+			    	expected = "onclicked!",
+					el = Ext.get("clicktest1");	
+							
+				el.on("click", function(e, el){ 
+					el.innerHTML = "onclicked!";
+				});
+				
+				fireEvent("click", el.dom);
+				
+				// wait for the event to fire
+				me.wait(function(){ 
+					Y.Assert.areEqual(expected, el.dom.innerHTML, expected); 
+				}, 
+				200);				
+		    },
+		    
+		    test_onDoubleClick : function() {	
+			    var me = this,
+			    	expected = "ondblclicked!",
+					el = Ext.get("clicktest2");	
+							
+				el.on("dblclick", function(e, el){ 
+					el.innerHTML = "ondblclicked!";
+				});
+				
+				fireEvent("dblclick", el.dom);
+				
+				// wait for the event to fire
+				me.wait(function(){ 
+					Y.Assert.areEqual(expected, el.dom.innerHTML, expected); 
+				}, 
+				200);		
+		    },
+		    
+		    test_removeListener : function() {
+			    var me = this,
+			    	expected = "ondblclicked1!",
+					el = Ext.get("clicktest3"),
+					fireCount = 1;
+					
+					function dblListener(e, el){
+						el.innerHTML = "ondblclicked" + (fireCount++) +"!";	
+					};					
+								
+				el.on("dblclick", dblListener);
+				
+				fireEvent("dblclick", el.dom);
+								
+				// wait for the event to fire
+				me.wait(function(){ 
+					Y.Assert.areEqual(expected, el.dom.innerHTML, expected); 
+					el.un("dblclick", dblListener);
+					
+					// should not have any handlers registered.
+					fireEvent("dblclick", el.dom);
+				
+					// wait for the event to fire
+					me.wait(function(){ 
+						Y.Assert.areEqual(expected, el.dom.innerHTML, expected); 
+					}, 
+					200);	
+				}, 
+				200);
+		    },
+		    
+		    test_eventTarget : function(){
+			 	var expected = "clicktest4",
+			 		element = Ext.get("clicktest4"),
+			 		result;
+			 	
+			 	element.on('click', function(e, el){
+				 	el.innerHTML = expected;
+					result = el.id;
+			 	});
+			 	
+			 	fireEvent('click', element.dom);
+			 	
+			 	// Make sure that the event was fired
+			 	this.wait(function(){
+				 	Y.Assert.areEqual(expected, element.dom.innerHTML, expected);
+				 	Y.Assert.areEqual(expected, result, expected);
+			 	},
+			 	200);
+		    },
+		    
+		    test_eventXY : function(){
+			 	var element = Ext.get("clicktest5"),
+			 		expected = "clicktest5",
+			 		expectedX = 40,
+			 		expectedY = 50,
+			 		resultX = 40,
+			 		resultY = 50;   
+			 		
+			 	element.on('click', function(e, el){
+					el.innerHTML = "clicktest5";
+					resultX = e.xy[0];
+					resultY = e.xy[1];					
+			 	});
+			 	
+			 	fireEvent('click', element.dom, 40, 50);
+			 	
+			 	// Make sure that the event was fired
+			 	this.wait(function(){
+				 	Y.Assert.areEqual(expected, element.dom.innerHTML, expected);
+				 	Y.Assert.areEqual(expectedX, resultX, expectedX);
+					Y.Assert.areEqual(expectedY, resultY, expectedY);
+			 	},
+			 	200);
+		    }
+	    }));	   
+	    	    
+        tool.TestRunner.run();       
+    });	    
+})();
+</script>
+
+</head>
+<body class="yui-skin-sam">
+<div id="clicktest1">Click Me</div>
+<div id="clicktest2">Click Me</div>
+<div id="clicktest3">Click Me</div>
+<div id="clicktest4">Click Me</div>
+<div id="clicktest5">Click Me</div>
+</body>
+</html>

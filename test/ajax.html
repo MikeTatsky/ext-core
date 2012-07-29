@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Ajax Test Suite</title>
+
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/logger/assets/logger.css">
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/yuitest/assets/testlogger.css">     
+
+<script type="text/javascript" src="yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script type="text/javascript" src="yui_2.6.0/yui/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+<script type="text/javascript" src="../ext-core-debug.js"></script>
+
+<script type="text/javascript">
+(function() {
+    var Y = YAHOO.util,
+        tool = YAHOO.tool,
+        suite = new tool.TestSuite("Ajax Test Suite");
+
+    Y.Event.onDOMReady(function(){
+	    var logger = new YAHOO.tool.TestLogger(null, { height: '80%' });
+	    tool.TestRunner.add(suite);
+	    	    
+	    suite.add( new tool.TestCase({
+		    name : 'Ajax Test Case',		    		    
+		    
+		    test_basicRequest : function(){
+				var expected = "basic";
+				
+				Ext.Ajax.request({					
+					url : "ajax.php",
+					success : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(expected, r.responseText, expected);
+						});
+					},
+					failure : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(1, 2, "Should have passed! " + r.status);
+						});
+					},					
+					scope : this,
+					params : {test : "basic"}
+				});
+				
+				this.wait();
+		    },
+		    
+		    test_fail : function(){
+			    var expected = "404";
+			    
+			    Ext.Ajax.request({					
+					url : "doesntexist.php",
+					success : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(1, 2, "Should have failed! " + r.responseText);
+						});
+					},
+					failure : function(r){
+						this.resume(function(){							
+							Y.Assert.areEqual(expected, r.status, expected);
+						});
+					},
+					scope : this,
+					params : {test : "basic"}						
+				});
+				
+				this.wait();
+		    },
+		    
+		    test_withForm : function(){
+				var expected = "text1 - text2";
+				
+				Ext.Ajax.request({   
+					url : "ajax.php",
+					success : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(expected, r.responseText, expected);
+						});
+					},
+					failure : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(1, 2, "Should have passed! " + r.status);
+						});
+					},
+					scope : this,					
+					form : "form1",
+					params : {test : "form1"}
+				});
+				
+				this.wait();
+		    },
+		    
+		    test_withFormSelect : function() {
+			    var expected = "option1 - option3";
+				
+				Ext.Ajax.request({   
+					url : "ajax.php",
+					success : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(expected, r.responseText, expected);
+						});
+					},
+					failure : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(1, 2, "Should have passed! " + r.status);
+						});
+					},
+					scope : this,					
+					form : "form2",
+					params : {test : "form2"}	
+				});
+				
+				this.wait();
+		    },
+		    
+		    test_headers : function(){
+			    var expected = "correct";
+			    
+			    Ext.Ajax.request({
+					url : "ajax.php",
+					success : function(r){						  
+						this.resume(function(){
+							Y.Assert.areEqual(expected, r.responseText, expected);
+					   	});
+				    },
+				    failure : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(1, 2, "Should have passed! " + r.status);
+						}); 	 	  
+				    },
+				    scope : this,
+					headers : {
+						'test': 'correct'   
+				    },
+				    params : {test : "head"} 
+				});
+				
+			    this.wait();
+		    },
+		    
+		    test_formUpload : function() {
+			 	var expected = "option1 - option3";
+				
+				Ext.Ajax.request({   
+					url : "ajax.php",
+					success : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(expected, r.responseText, expected);
+						});
+					},
+					failure : function(r){
+						this.resume(function(){
+							Y.Assert.areEqual(1, 2, "Should have passed! " + r.status);
+						});
+					},
+					scope : this,					
+					form : "form2",
+					isUpload : true,
+					params : {test : "form2"}	
+				});
+				
+				this.wait();  
+		    }
+	    }));	   
+	    	    
+        tool.TestRunner.run();       
+    });	    
+})();
+</script>
+
+</head>
+<body class="yui-skin-sam">  
+
+	<form id="form1" style="visibility: hidden">
+		<input type="text" name="parm1" value="text1"/>
+		<input type="text" name="parm2" value="text2"/>
+	</form>
+	
+	<form id="form2" style="visibility: hidden">
+		<select multiple="yes" name="parm1[]">
+			<option value="option1" selected="selected">Option1</option>
+			<option value="option2">Option2</option>
+			<option value="option3" selected="selected">Option3</option>
+		</select>
+	</form>
+</body>
+</html>

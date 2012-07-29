@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>DOM Test Suite</title>
+
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/logger/assets/logger.css">
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/yuitest/assets/testlogger.css">     
+
+<script type="text/javascript" src="yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script type="text/javascript" src="yui_2.6.0/yui/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+<script type="text/javascript" src="../ext-core-debug.js"></script>
+
+<script type="text/javascript">
+(function() {
+    var Y = YAHOO.util,
+        tool = YAHOO.tool,
+        suite = new tool.TestSuite("DOM Suite");
+
+    Y.Event.onDOMReady(function(){
+	    var logger = new YAHOO.tool.TestLogger(null, { height: '80%' });
+	    tool.TestRunner.add(suite);
+	    	    
+	    suite.add( new tool.TestCase({
+		    name : 'DOM Tests',
+		    		    		    
+		    test_getViewportWidth : function() {
+			    var expected;
+			    if(!Ext.isStrict && !Ext.isOpera){
+	                expected = document.body.clientWidth;
+	            } else if(Ext.isIE){
+	                expected = document.documentElement.clientWidth;
+	            }else{
+	                expected = self.innerWidth;
+	            }
+	            
+			 	Y.Assert.areEqual(expected, Ext.lib.Dom.getViewportWidth(), expected); 
+		    },
+		    
+		    test_getViewportHeight : function() {
+			    var expected;
+ 	            if(Ext.isIE){
+	                expected = Ext.isStrict ? document.documentElement.clientHeight :
+	                           document.body.clientHeight;
+	            }else{
+	                expected = self.innerHeight;
+	            }   
+	            
+	            Y.Assert.areEqual(expected, Ext.lib.Dom.getViewportHeight(), expected);
+		    },
+		    
+		    test_isAncestor : function() {
+			 	var parent = Ext.get("test1parent");
+			 	var grandChild = Ext.get("test1grandchild");
+			 	
+			 	Y.Assert.areEqual(true, Ext.lib.Dom.isAncestor(parent, grandChild), true);
+			 	Y.Assert.areEqual(false, Ext.lib.Dom.isAncestor(grandChild,parent), false);   
+		    },
+		    
+		    test_getXY : function() {
+				var sample = Ext.get("test2");
+				
+				if (Ext.isIE) {
+					Y.Assert.areEqual(12, Ext.lib.Dom.getXY(sample)[0], 12);
+					Y.Assert.areEqual(36, Ext.lib.Dom.getXY(sample)[1], 36);
+				} else {
+					Y.Assert.areEqual(8, Ext.lib.Dom.getXY(sample)[0], 8);
+					if (Ext.isSafari) {
+						Y.Assert.areEqual(26, Ext.lib.Dom.getXY(sample)[1], 26);
+					} else {
+						Y.Assert.areEqual(28, Ext.lib.Dom.getXY(sample)[1], 28);
+					}
+				}				
+		    },
+		    
+		    test_setXY : function() {
+			 	var sample = Ext.get("test4");
+			 	
+			 	Ext.lib.Dom.setY(sample.dom, 30);
+			 	Ext.lib.Dom.setX(sample.dom, 45);
+			 	Y.Assert.areEqual(30, sample.getY(), 30);
+			 	Y.Assert.areEqual(45, sample.getX(), 45);			 	
+		    },
+		    
+		    test_move : function() {
+			 	var sample = Ext.get("test5");
+			 	sample.move("r", 100);
+			 	Y.Assert.areEqual(Ext.isIE ? 112 : 108, sample.getX(), Ext.isIE ? 112 : 108);   
+		    }
+	    }));	   
+	    	    
+        tool.TestRunner.run();       
+    });	    
+})();
+</script>
+
+</head>
+<body class="yui-skin-sam">  
+	<div id="test1parent"><div id="test1child"><div id="test1grandchild">test1</div></div></div>
+	<div id="test2">test2<div id="test3">test3</div></div>
+	<div id="test4">test4</div>
+	<div id="test5">test5</div>
+</body>
+</html>

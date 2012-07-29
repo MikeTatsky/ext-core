@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Ext Tabs Example</title>
+    
+    <link href="../examples.css" rel="stylesheet" />
+    <link href="tabs.css" rel="stylesheet" />
+    
+	<style>
+		#tabs {
+			width: 400px;
+		}
+	</style>
+	
+    <script src="../../ext-core-debug.js"></script>
+    <script src="tabs.js"></script>
+
+	<script>
+		Ext.onReady(function() {
+			var tabs = new Ext.ux.Tabs('tabs', { // option config
+				activeTab: 'tab-animals' // either index or id
+			});
+		});
+	</script>
+</head>
+<body> 
+    <div id="tabs">
+        <ul>
+		    <li><a href="#tab-nature">Nature</a></li>        
+		    <li><a href="#tab-vehicles">Vehicles</a></li>        
+		    <li><a href="#tab-animals">Animals</a></li>
+		</ul>
+
+        <div id="tab-nature">
+	        <b>Things in Nature</b>
+	        <ul>
+	            <li>Plants</li>
+	            <li>Ocean</li>
+	            <li>Trees</li>
+	            <li>Skies</li>
+	            <li>Mountains</li>
+	        </ul>
+        </div>   
+     
+        <div id="tab-vehicles">
+	        <b>Types of Vehicles</b>
+	        <ul>
+	            <li>Cars</li>
+	            <li>Boats</li>
+	            <li>Trucks</li>
+	            <li>Bikes</li>
+	        </ul>
+        </div> 
+       
+        <div id="tab-animals">
+	        <b>Types of Animals</b>
+	        <ul>
+	            <li>Tigers</li>
+	            <li>Elephants</li>
+	            <li>Fish</li>
+	            <li>Birds</li>
+	        </ul>
+        </div>    
+    </div>
+</body>
+</html>

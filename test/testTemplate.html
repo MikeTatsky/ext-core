@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Generic Test Suite</title>
+
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/logger/assets/logger.css">
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/yuitest/assets/testlogger.css">     
+
+<script type="text/javascript" src="yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script type="text/javascript" src="yui_2.6.0/yui/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+<script type="text/javascript" src="../src/sourceToTest.js"></script>
+
+<script type="text/javascript">
+(function() {
+    var Y = YAHOO.util,
+        tool = YAHOO.tool,
+        suite = new tool.TestSuite("Ext Core Suite");
+
+    Y.Event.onDOMReady(function(){
+	    var logger = new YAHOO.tool.TestLogger(null, { height: '80%' });
+	    tool.TestRunner.add(suite);
+	    	    
+	    suite.add( new tool.TestCase({
+		    name : 'Test Name'		    		    
+		    /*
+		    test_case : function(){
+				var sample = ["data"];
+				var expected = ["data"]
+				var result = sample;
+				Y.ArrayAssert.itemsAreEqual(expected, result, expected);
+		    }
+		    */
+	    }));	   
+	    	    
+        tool.TestRunner.run();       
+    });	    
+})();
+</script>
+
+</head>
+<body class="yui-skin-sam">  
+</body>
+</html>

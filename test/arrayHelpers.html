@@ -1,0 +1,232 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Array Helper Test Suite</title>
+
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/logger/assets/logger.css">
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/yuitest/assets/testlogger.css">	   
+
+<script type="text/javascript" src="yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script type="text/javascript" src="yui_2.6.0/yui/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+<script type="text/javascript" src="../ext-core-debug.js"></script>
+
+<script type="text/javascript">
+(function() {
+	var Y = YAHOO.util,
+		tool = YAHOO.tool,
+		suite = new tool.TestSuite("Ext Core Suite");
+
+	Y.Event.onDOMReady(function(){
+		var logger = new YAHOO.tool.TestLogger(null, { height: '80%' });
+		tool.TestRunner.add(suite);
+		
+		suite.add( new tool.TestCase({
+			name : 'Test Array Helpers',
+			
+			test_clean : function(){
+				var sample = [,,1,2,,,3,,4,5,6,null,7];
+				var expected = [1,2,3,4,5,6,7];
+				var result = Ext.clean(sample)
+				Y.ArrayAssert.itemsAreEqual(expected, result, expected);	
+			},
+			
+			test_flatten : function(){
+				var sample = [1,2,[3,4],5,[6,[7,8]],9];
+				var expected = [1,2,3,4,5,6,7,8,9];  
+				var result = Ext.flatten(sample);
+				Y.ArrayAssert.itemsAreEqual(expected, result, expected);  
+			},
+			
+			test_unique : function(){
+				var sample = [1,2,2,3,4,5,4,3,2];
+				var expected = [1,2,3,4,5]; 
+				var result = Ext.unique(sample);				
+				Y.ArrayAssert.itemsAreEqual(expected, result, expected);  
+			},
+			
+			test_minNumber : function(){
+				var sample = [1,2,2,3,4,5,4,3,2];
+				var expected = 1;
+				var result = Ext.min(sample);
+				Y.Assert.areEqual(expected, result, expected);	
+			},
+			
+			test_minObject : function(){
+				var t1 = {val:1,id:1};
+				var t2 = {val:7,id:2,other:'blah'};
+				var t3 = {val:3,id:3,other:'...'};
+				var sample = [t1,t2,t3];  
+				var expected = t1;
+				var result = Ext.min(sample,function(a,b){ return a.val < b.val ? -1 : 1 });
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_maxNumber : function(){
+				var sample = [1,2,2,3,4,5,4,3,2];
+				var expect = 5;
+				var result = Ext.max(sample);
+				Y.Assert.areEqual(expect, result, expect);	
+			},
+			
+			test_maxObject : function(){
+				var t1 = {val:1,id:1};
+				var t2 = {val:7,id:2,other:'blah'};
+				var t3 = {val:3,id:3,other:'...'};
+				var sample = [t1,t2,t3];  
+				var expected = t2;
+				var result = Ext.max(sample,function(a,b){ return a.val > b.val ? 1 : -1 });
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_medianOddLength : function(){
+				var sample = [1,3,2,5,7,8,4,5,6,3,8];						
+				var expected = 5;
+				var result = Ext.median(sample);
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_medianEvenLength : function(){
+				var sample = [1,3,2,5,7,8,4,5,6,3];												
+				var expected = 4.5;
+				var result = Ext.median(sample);
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_medianObjectOddLength : function(){
+				var t1 = {val:1,id:1};
+				var t2 = {val:7,id:2,other:'blah'};
+				var t3 = {val:3,id:3,other:'...'};
+				var t4 = {val:3,id:4};
+				var t5 = {val:5,id:5,other:'blah'};				
+				var sample = [t1,t2,t3,t4,t5];
+				var expected = t3.val;
+				var result = Ext.median(sample, 
+					function(a,b){ 
+						return a.val == b.val ? 0 : a.val < b.val ? -1 : 1;
+					}).val;
+				Y.Assert.areEqual(expected, result, expected.val + " -- " + result.val);
+			},
+			
+			test_medianObjectEvenLength : function(){
+				var t1 = {val:1,id:1};
+				var t2 = {val:7,id:2,other:'blah'};
+				var t3 = {val:3,id:3,other:'...'};
+				var t4 = {val:3,id:4};
+				var t5 = {val:5,id:5,other:'blah'};
+				var t6 = {val:100,id:6,other:'...'};				
+				var sample = [t1,t2,t3,t4,t5,t6];
+				var expected = t5;
+				var result = Ext.median(sample, 
+					function(a,b){ 
+						return a.val == b.val ? 0 : a.val < b.val ? -1 : 1;
+					},
+					function(a,b){
+						return a.val >= b.val ? a : b; 
+					});
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_mean : function(){
+				var sample = [1,2,4,3,6,7,2,8];
+				var expected = 	4.125;
+				var result = Ext.mean(sample);
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_mode : function(){
+				var sample = [1,3,2,4,3,3,5,3,2,6,7,8];
+				var expected = 3;
+				var result = Ext.mode(sample);
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_sum : function(){
+				var sample = [1,2,3,4,5,6,7,8,9];
+				var expected = 45;
+				var result = Ext.sum(sample);
+				Y.Assert.areEqual(expected, result, expected);
+			},
+			
+			test_parition : function(){
+				var sample = [true,false,true,true,false]
+				var expected = [[true,true,true],[false,false]];
+				var result = Ext.partition(sample);
+				Y.ArrayAssert.itemsAreEqual(expected[0], result[0], expected[0]);
+				Y.ArrayAssert.itemsAreEqual(expected[1], result[1], expected[1]);
+			},
+			
+			test_paritionAdv : function(){
+				var t1 = {prop:1};
+				var t2 = {prop:2};
+				var t3 = {prop:3};
+				var t4 = function(){ return true };
+				var t5 = function(){ return true };
+				var sample = [t5,t2,t3,t1,t4]
+				var expected = [[t2,t3,t1],[t5,t4]];
+				var result = Ext.partition(sample, function(a){ return typeof a != "function"});
+				Y.ArrayAssert.itemsAreEqual(expected[0], result[0], expected[0]);
+				Y.ArrayAssert.itemsAreEqual(expected[1], result[1], expected[1]);
+			},
+			
+			test_invoke : function(){
+				var t1 = {prop:function(val){return val;}};
+				var t2 = {prop:function(val){return val;}};
+				var t3 = {prop:function(val){return val;}};
+				var sample = [t1,t2,t3];//document.getElementById("container").getElementsByTagName("p");
+				var expected = [1, 1, 1];				
+				var result = Ext.invoke(sample,"prop",1);
+				Y.ArrayAssert.itemsAreEqual(expected, result, expected);	
+			},
+			
+			test_pluck : function(){
+				var sample = document.getElementById("container").getElementsByTagName("p");
+				var expected = ["p1","p2","p3","p4"];
+				var result = Ext.pluck(sample,"id");
+				Y.ArrayAssert.itemsAreEqual(expected, result, expected);		
+			},
+			
+			test_zip : function(){
+				var sample1 = ['a','c','e','g'];
+				var sample2 = ['b','d','f','h','j'];
+				var expected = [['a','b'],['c','d'],['e','f'],['g','h'],[undefined,'j']];
+				var result = Ext.zip(sample1,sample2);
+				Y.ArrayAssert.itemsAreEquivalent(expected, result, 
+					function(a,b){
+						if( a.length != b.length) return false;
+						for( var i = 0, len = a.length; i < len; i++){
+							if(a[i] != b[i]) return false;	
+						}
+						return true;
+					},
+					expected);
+			},
+			
+			test_zipAdv : function(){
+				var sample1 = ["+","-","+"];
+				var sample2 = [12,10,22];
+				var sample3 = [43,15,96];
+				var formatter = function(a,b,c){ return "$" + a + "" + b + "." + c };
+				var expected = ["$+12.43", "$-10.15", "$+22.96"];
+				var result = Ext.zip(sample1, sample2, sample3, formatter);
+				Y.ArrayAssert.itemsAreEqual(expected, result, expected);
+			}
+		}));   
+		   
+		tool.TestRunner.run();		 
+	}); 	
+})();
+</script>
+
+</head>
+<body class="yui-skin-sam">
+
+<div id="container">
+	<p id="p1"></p>
+	<p id="p2"></p>
+	<p id="p3"></p>
+	<p id="p4"></p>
+</div>
+
+</body>
+</html>

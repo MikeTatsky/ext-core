@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Style Test Suite</title>
+
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/logger/assets/logger.css">
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/yuitest/assets/testlogger.css">  
+
+<script type="text/javascript" src="yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script type="text/javascript" src="yui_2.6.0/yui/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+<script type="text/javascript" src="../ext-core-debug.js"></script>
+
+
+<style type="text/css">
+.class1 {
+	color : #ff0000;
+}
+
+.class2 {
+	color : #0000ff;
+}
+
+.class3 {
+	border: solid 1px #000000;	
+}
+</style> 
+
+
+<script type="text/javascript">
+(function() {
+    var Y = YAHOO.util,
+        tool = YAHOO.tool,
+        suite = new tool.TestSuite("Style Suite");
+        
+    function fireEvent(type, element, x, y){
+    	if( document.createEvent ){
+			customEvent = document.createEvent("MouseEvents");
+			if (customEvent.initMouseEvent) {
+				customEvent.initMouseEvent(type, false, false, null, null,
+                                 null, null,x, y,
+                                 null, null, null, null, 
+                                 null, null);
+			} else {
+				customEvent.initEvent(type, false, false);
+				customEvent.clientX = x;
+				customEvent.clientY = y;	
+			}
+			
+			element.dispatchEvent(customEvent);	
+		} else {
+			customEvent = document.createEventObject();
+			customEvent.clientX = x;
+			customEvent.clientY = y;
+			element.fireEvent("on" + type, customEvent);	
+		}   
+   }
+       
+   function parseColor (color) {
+	    if (Ext.isIE) {
+		 	return color;   
+	    } else {
+		    return "rgb(" + parseInt(color[1] + color[2], 16) + ", " + 
+		    				parseInt(color[3] + color[4], 16) + ", " + 
+		    				parseInt(color[5] + color[6], 16) + ")";
+	    }
+    }
+
+    Y.Event.onDOMReady(function(){
+	    var logger = new YAHOO.tool.TestLogger(null, { height: '80%' });
+	    tool.TestRunner.add(suite);
+	    	    
+	    suite.add( new tool.TestCase({
+		    name : 'Style Tests',
+		    
+		    test_addClass : function() {
+			    var sample = Ext.get("test1");
+			    			    
+			   	sample.addClass("class1");
+			   	Y.Assert.areEqual(true, sample.hasClass("class1"), true);			    
+		    },
+		    
+		    test_removeClass : function() {
+			 	var sample = Ext.get("test2");
+			 			 	
+			 	Y.Assert.areEqual(true, sample.hasClass("class1"), true);
+			 	
+			 	sample.removeClass("class1");
+			 	
+			 	Y.Assert.areEqual(true, sample.hasClass("class3"), true);			 				 	
+			 	Y.Assert.areEqual(false, sample.hasClass("class1"), false);
+			},
+			
+			test_toggleClass : function() {
+				var sample = Ext.get("test2");			 	
+			 	
+			 	Y.Assert.areEqual(false, sample.hasClass("class1"), false);
+			 	
+			 	sample.toggleClass("class1");
+			 	
+			 	Y.Assert.areEqual(true, sample.hasClass("class3"), true);
+			 	Y.Assert.areEqual(true, sample.hasClass("class1"), true);
+			 	
+			 	sample.toggleClass("class3");
+			 	
+			 	Y.Assert.areEqual(true, sample.hasClass("class1"), true);
+			 	Y.Assert.areEqual(false, sample.hasClass("class3"), false);
+			},
+			
+			test_radioClass : function() {
+				Y.Assert.areEqual(false, Ext.get("test18b").hasClass("class1"), false);
+				Y.Assert.areEqual(true, Ext.get("test18a").hasClass("class1"), true);
+				Y.Assert.areEqual(true, Ext.get("test18c").hasClass("class1"), true);
+				
+				Ext.get("test18b").radioClass("class1")
+				Y.Assert.areEqual(true, Ext.get("test18b").hasClass("class1"), true);
+				Y.Assert.areEqual(false, Ext.get("test18a").hasClass("class1"), false);
+				Y.Assert.areEqual(false, Ext.get("test18c").hasClass("class1"), false);
+				
+				Ext.get("test18b").radioClass("class1")
+				Y.Assert.areEqual(true, Ext.get("test18b").hasClass("class1"), true);
+				Y.Assert.areEqual(false, Ext.get("test18a").hasClass("class1"), false);
+				Y.Assert.areEqual(false, Ext.get("test18c").hasClass("class1"), false);
+				
+				Ext.get("test18a").radioClass("class1")
+				Y.Assert.areEqual(false, Ext.get("test18b").hasClass("class1"), false);
+				Y.Assert.areEqual(true, Ext.get("test18a").hasClass("class1"), true);
+				Y.Assert.areEqual(false, Ext.get("test18c").hasClass("class1"), false);
+			},
+			
+			test_replaceClass : function() {
+				var sample = Ext.get("test3");
+				
+				Y.Assert.areEqual(true, sample.hasClass("class1"), true);
+				Y.Assert.areEqual(true, sample.hasClass("class2"), true);
+				
+				sample.replaceClass("class1", "class3");
+				
+				Y.Assert.areEqual(true, sample.hasClass("class3"), true);
+				Y.Assert.areEqual(true, sample.hasClass("class2"), true);
+				Y.Assert.areEqual(false, sample.hasClass("class1"), false);					
+			},
+			
+			test_getStyles : function() {
+				var sample = Ext.get("test4");
+				
+				Y.Assert.areEqual(parseColor("#00f8e9"), sample.getStyle("color"), parseColor("#00f8e9")); 	
+				
+				Y.Assert.areEqual(true, sample.getStyle("border").indexOf(parseColor("#8855ff")) != -1 || 
+										sample.getStyle("border-top").indexOf(parseColor("#8855ff")) != -1, true); 
+				// TODO : add more here ...				
+			},
+			
+			test_setStyles : function() {
+				var sample = Ext.get("test5");	
+				
+				Y.Assert.areEqual(parseColor("#00f8e9"), sample.getStyle("color"), parseColor("#00f8e9")); 
+				sample.setStyle("color", "#aaffbb");
+				Y.Assert.areEqual(parseColor("#aaffbb"), sample.getStyle("color"), parseColor("#aaffbb"));
+				// TODO : add more here ... 	
+			},
+			
+			test_setOpacity : function() {
+				var sample = Ext.get("test6");
+				sample.setOpacity(.5);
+				
+				Y.Assert.areEqual(.5, sample.getStyle("opacity"), .5);
+								
+			},
+			
+			test_applyStyles : function() {
+				// this test uses DomHelper
+				var sample = Ext.get("test7");
+				
+				// test string
+				sample.applyStyles({width : "100px"});
+				Y.Assert.areEqual(100, sample.getWidth(), 100);
+											
+				// test object literal
+				sample.applyStyles("height:50px");
+				Y.Assert.areEqual(50, sample.getHeight(), 50);
+								
+				// test function
+				sample.applyStyles(function(){ return "color:#ff6677;"});				
+				Y.Assert.areEqual(parseColor("#ff6677"), sample.getStyle("color"), parseColor("#ff6677"));
+			},
+			
+			test_setWidth : function() {
+				var sample = Ext.get("test8");
+				
+				sample.setWidth(25);
+				Y.Assert.areEqual(25 , sample.getWidth(), 25);
+			},
+			
+			test_setHeight : function() {
+				var sample = Ext.get("test9");
+				
+				sample.setHeight(30);
+				Y.Assert.areEqual(30 , sample.getHeight(), 30);
+			},
+			
+			test_setWidth : function() {
+				var sample = Ext.get("test10");	
+				
+				sample.setSize(30, 40);
+				Y.Assert.areEqual(30, sample.getWidth(), 30);
+				Y.Assert.areEqual(40, sample.getHeight(), 40);
+			},
+			
+			// This fails in FF.  Seems to be border issues with FF?
+			test_getBorderWidth : function() {
+				var sample = Ext.get("test11");
+				
+				Y.Assert.areEqual(1, sample.getBorderWidth("t"), 1);
+				Y.Assert.areEqual(2, sample.getBorderWidth("l"), 2);
+			},
+			
+			test_getPadding : function() {
+				var sample = Ext.get("test12");
+				
+				Y.Assert.areEqual(10, sample.getPadding("l"), 10);	
+			},
+			
+			test_clip : function() {
+				var sample = Ext.get("test13");
+				
+				// write this test
+				
+				
+				
+			},
+			
+			test_getMargins : function() {
+				var sample	= Ext.get("test14");
+				
+				Y.Assert.areEqual(10, sample.getMargins("r"), 10); 
+				Y.Assert.areEqual(5, sample.getMargins("b"), 5);
+				Y.Assert.areEqual(10, sample.getMargins().right, 10);
+				Y.Assert.areEqual(5, sample.getMargins().bottom, 5);
+			},
+	
+			test_addClassOnHover : function() {
+				var sample = Ext.get("test15");
+				
+				Y.Assert.areEqual(false, sample.hasClass("class1"), false);
+				sample.addClassOnOver("class1");
+				fireEvent("mouseover", sample.dom);
+				
+				this.wait(function(){					
+					Y.Assert.areEqual(true, sample.hasClass("class1"), true);						
+				},
+				200);
+			},
+			
+			test_addClassOnClick : function() {
+				var sample = Ext.get("test16");
+				
+				Y.Assert.areEqual(false, sample.hasClass("class1"), false);
+				sample.addClassOnClick("class1");
+				fireEvent("mousedown", sample.dom);
+				
+				this.wait(function(){					
+					Y.Assert.areEqual(true, sample.hasClass("class1"), true);						
+				},
+				200);
+				
+				fireEvent("mouseup", sample.dom);
+				
+				this.wait(function(){					
+					Y.Assert.areEqual(false, sample.hasClass("class1"), false);						
+				},
+				200);
+			},
+			
+			test_color : function() {
+				var sample = Ext.get("test17");
+				
+				Y.Assert.areEqual("#ffffff", sample.getColor("color"), "#ffffff");	
+			}
+			
+			// TODO: write test for getFrameWidth
+			// TODO: computed height/width tests
+			// TODO: viewport tests
+			// TODO: boxWrap test
+			// TODO: unselectable test
+			// TODO: repaint test?
+			
+	    }));	   
+	    	    
+        tool.TestRunner.run();       
+    });	    
+})();
+</script>
+
+</head>
+<body class="yui-skin-sam">
+	<div id="test1">test1</div>
+	<div id="test2" class="class1 class3">test2</div>
+	<div id="test3" class="class1 class2">test3</div>
+	<div id="test4" style="color: #00f8e9; border: solid 1px #8855ff;">test4</div>
+	<div id="test5" style="color: #00f8e9; border: solid 1px #8855ff;">test5</div>
+  	<div id="test6">test6</div>
+  	<div id="test7" style="border: 1px">test7</div>
+  	<div id="test8">test8</div>
+  	<div id="test9">test9</div>
+  	<div id="test10">test10</div>
+  	<div id="test11" style="border-top: 1px; border-left: 2px">test11</div>
+  	<div id="test12" style="border-top: 1px; border-left: 2px; padding-left: 10px">test12</div>
+  	<div id="test13" style="border-top: 1px; border-left: 2px">test13</div>
+  	<div id="test14" style="border-top: 1px; border-left: 2px; margin-bottom: 5px; margin-right: 10px;">test14</div>
+  	<div id="test15">test15</div>
+  	<div id="test16">test16</div>
+  	<div id="test17" style="color: rgb(255, 255, 255);">test17</div>
+  	<div>
+  		<div id="test18a" class="class1">test18a</div>
+  		<div id="test18b">test18b</div>
+  		<div id="test18c" class="class1">test18c</div>
+  	</div>
+</body>
+</html>

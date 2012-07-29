@@ -1,0 +1,304 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Animation Test Suite</title>
+
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/logger/assets/logger.css">
+<link type="text/css" rel="stylesheet" href="yui_2.6.0/yui/build/yuitest/assets/testlogger.css">     
+
+<script type="text/javascript" src="yui_2.6.0/yui/build/yahoo-dom-event/yahoo-dom-event.js"></script> 
+<script type="text/javascript" src="yui_2.6.0/yui/build/logger/logger-min.js"></script>
+<script type="text/javascript" src="yui_2.6.0/yui/build/yuitest/yuitest-min.js"></script>
+<script type="text/javascript" src="../ext-core-debug.js"></script>
+
+<style type="text/css">
+#testcontainer div {
+	border: 1px solid #000000;
+    background:#ccc;
+    height:100px;
+    width:100px;
+    overflow:hidden;
+}
+</style>
+
+<script type="text/javascript">
+(function() {
+    var Y = YAHOO.util,
+        tool = YAHOO.tool,
+        suite = new tool.TestSuite("Ext Core Suite");
+
+    Y.Event.onDOMReady(function(){
+	    var logger = new YAHOO.tool.TestLogger(null, { height: '80%' });
+	    tool.TestRunner.add(suite);
+	    	    
+	    suite.add( new tool.TestCase({
+		    name : 'Animation Tests',
+		    
+		    test_fadeOut : function(){
+				var el = Ext.get("fadeout"); 
+				el.fadeOut({duration : .35, endOpacity : .3});				
+				var expected = .3;
+						
+				this.wait(function(){					
+					Y.Assert.areEqual(expected, parseFloat(el.getStyle("opacity")).toPrecision(1), expected);										
+				},500);    
+		    },
+		    
+		    test_fadeIn : function(){
+				var el = Ext.get("fadein"); 				
+				el.fadeIn({duration : .35, endOpacity : .7});				
+				var expected = .7;
+				
+				this.wait(function(){
+					Y.Assert.areEqual(expected, el.getStyle("opacity"), expected);					
+				},700);
+		    },
+		    
+		    test_frame : function(){
+			    var el = Ext.get("frame");
+			    el.frame("ff0000", 2, {duration : 2});
+			    el.pause(2.2);
+			    this.wait(function(){
+					//TODO: assertions here.    
+				},2200);			    
+		    },
+		    
+		    test_ghost : function(){
+			    var el = Ext.get("ghost");
+			    el.ghost('r', {
+				    easing : 'easeOut',
+				    duration : 2,
+				    remove : false,
+				    useDisplay : false
+			    });
+			    el.pause(2.2);
+			    this.wait(function(){
+				    //TODO: think of more assertions here.
+				    Y.Assert.areEqual("hidden", el.getStyle("visibility"), "hidden");
+				},2200);							    
+		    },
+		    
+		    test_highlight : function(){
+				var el = Ext.get("highlight");
+				el.highlight("0000ff");
+				
+				el.pause(2.2);
+				
+				this.wait(function(){
+					//TODO: assertions here.
+				},2200);
+		    },
+		    
+		    test_puff : function(){
+			  	var el = Ext.get("puff");
+			  	el.puff(); 
+			  	
+			  	this.wait(function(){
+				  	Y.Assert.areEqual("hidden",el.getStyle("visibility"),"hidden");
+			  	},1000);
+
+		    },
+		    
+		    test_scale : function(){
+			  	var el = Ext.get("scale");  
+			  	el.scale(200, 200, { easing : 'easeOut', duration : .35});
+			  	expected = 200;
+			  	this.wait(function(){
+					Y.Assert.areEqual(expected, el.getWidth(), expected);
+					Y.Assert.areEqual(expected, el.getHeight(), expected);
+			  	},500);
+		    },
+		    
+		    test_shift : function(){
+			  	var el = Ext.get("shift");
+			  	el.shift({x:200, height: 200, opacity : .7, duration : .35});
+			  	var expected = [200, 200, .7];
+			  	
+			  	this.wait(function(){
+				  	Y.Assert.areEqual(expected[0], el.getX(), expected[0]);
+				  	Y.Assert.areEqual(expected[1], el.getHeight(), expected[1]);
+				  	Y.Assert.areEqual(expected[2], el.getStyle("opacity"), expected[2]);
+			  	},500);  
+		    },
+		    
+		    test_slideIn : function(){
+			  	var el = Ext.get("slidein");
+			  	el.slideIn("r", {duration : .35});
+			  	var expected = ["visible", 300];
+			  	
+			  	this.wait(function(){
+				  	Y.Assert.areEqual(expected[0], el.getStyle("visibility"), expected[0]);
+				  	Y.Assert.isTrue(el.getX() > 300 && el.getX() < 315, expected[1]); // val of x is different in each browser so lets verify that it is within this range.
+			  	},500);  
+		    },
+		    
+		    test_slideOut : function(){
+			  	var el = Ext.get("slideout");
+			  	el.slideOut("r", {duration : .35});
+			  	var expected = ["hidden", 0];
+			  	
+			  	this.wait(function(){
+				  	Y.Assert.areEqual(expected[0], el.getStyle("visibility"), expected[0]);				  	
+				  	Y.Assert.isTrue(el.getX() > 0 && el.getX() < 15, "X is not within the correct range: [0,15] it is:" + el.getX()); // val of x is different in each browser so lets verify that it is within this range.
+			  	},500);  
+		    },
+		    
+		    test_switchOff : function(){
+			  	var el = Ext.get("switchoff");
+			  	el.switchOff(); 
+			  	var expected = "hidden";
+			  	
+			  	this.wait(function(){
+				  	Y.Assert.areEqual(expected, el.getStyle("visibility"), expected);
+			  	},700); 
+		    },
+		    
+		    test_easingEaseNone : function(){
+				var sample = [1,-.7,350,349];
+				var expected = 0.302865329512894;
+				var result = Ext.lib.Easing.easeNone.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingEaseIn : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.6971264603738885;
+				var result = Ext.lib.Easing.easeIn.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingEaseOut : function(){
+				var sample = [1,-.7,350,349];
+				var expected = 1.3028571193996765;
+				var result = Ext.lib.Easing.easeOut.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingEaseBoth : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.6942529207477771;
+				var result = Ext.lib.Easing.easeBoth.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingEaseInStrong : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.6999999764079143;
+				var result = Ext.lib.Easing.easeInStrong.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingEaseOutStrong : function(){
+				var sample = [1,-.7,350,349];
+				var expected = 3.2942529912543934;
+				var result = Ext.lib.Easing.easeOutStrong.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingEaseBothStrong : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.6999998112633147;
+				var result = Ext.lib.Easing.easeBothStrong.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingElasticIn : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.8559036681354709;
+				var result = Ext.lib.Easing.elasticIn.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingElasticOut : function(){
+				var sample = [1,-.7,350,349];
+				var expected = 6.800416181381865;
+				var result = Ext.lib.Easing.elasticOut.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingElasticBoth : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.6552226229759963;
+				var result = Ext.lib.Easing.elasticBoth.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingBackIn : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.7048673137255285;
+				var result = Ext.lib.Easing.backIn.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingBackOut : function(){
+				var sample = [1,-.7,350,349];
+				var expected = 3.996674085770419;
+				var result = Ext.lib.Easing.backOut.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingBackBoth : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.7147947538164616
+				var result = Ext.lib.Easing.backBoth.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingBounceIn : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.03226122938231124;
+				var result = Ext.lib.Easing.bounceIn.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_easingBounceOut : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.6782688565775321;
+				var result = Ext.lib.Easing.bounceOut.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },		    
+		    
+		    test_easingBounceBoth : function(){
+				var sample = [1,-.7,350,349];
+				var expected = -0.05399237280483926;
+				var result = Ext.lib.Easing.bounceBoth.apply(Ext.lib.Easing,sample);
+				Y.Assert.areEqual(expected, result, expected);
+		    },
+		    
+		    test_ElAlignAlignTo : function(){
+				var el = Ext.get("align1");
+				var el2 = Ext.get("align2");
+				el.alignTo(el2, "c-br", [10, 5], {duration: .35, easing: "easeOut"});
+				var expected = [el.getX() + 61, el.getY() + 158];
+				
+				this.wait(function(){
+					Y.Assert.areEqual(expected[0], el.getX(), expected[0]); 
+					Y.Assert.areEqual(expected[1], el.getY(), el.getX()); 
+				},500);
+		    }   
+	    }));	   
+	    	    
+        tool.TestRunner.run();       
+    });	    
+})();
+</script>
+
+</head>
+<body class="yui-skin-sam"> 
+	<div id="testcontainer">
+		<div id="align1">align1</div>
+		<div id="align2">align2</div>
+		<div id="fadeout">fadeout</div>		
+		<div id="fadein" style="visibility: hidden">fadein</div>		
+		<div id="frame">frame</div>
+		<div id="ghost">ghost</div>
+		<div id="highlight">highlight</div>
+		<div id="puff">puff</div>
+		<div id="scale">scale</div>	
+		<div id="shift">shift</div>
+		<div id="slidein" style="position: relative; visibility: hidden; left: 300px;">slidein</div>
+		<div id="slideout">slideout</div>
+		<div id="switchoff">switchoff</div>
+	</div> 
+</body>
+</html>
