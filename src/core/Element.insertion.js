@@ -135,5 +135,5 @@ function() {
 		    var el = DH.insertHtml(where, this.dom, html);
 		    return returnEl ? Ext.get(el) : el;
 		}
-	}
+	};
 }());

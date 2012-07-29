@@ -270,6 +270,9 @@ Ext.lib.Event = function() {
             if (ev.preventDefault) {
                 ev.preventDefault();
             } else {
+                if (ev.keyCode) {
+                    ev.keyCode = 0;
+                }
                 ev.returnValue = false;
             }
         },
